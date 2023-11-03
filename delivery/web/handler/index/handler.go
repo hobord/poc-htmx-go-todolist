@@ -16,5 +16,7 @@ func NewHandler() Handler {
 func (h *handler) IndexPage(w http.ResponseWriter, r *http.Request) {
 	layout := layouts.IndexPage()
 
-	layout.Render(r.Context(), w)
+	if err := layout.Render(r.Context(), w); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
