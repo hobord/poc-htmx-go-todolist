@@ -2,6 +2,7 @@ package web
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"net"
 	"net/http"
@@ -9,6 +10,11 @@ import (
 	"github.com/hobord/poc-htmx-go-todolist/composition"
 	"github.com/hobord/poc-htmx-go-todolist/delivery/web/router"
 	"github.com/hobord/poc-htmx-go-todolist/entities"
+)
+
+var (
+	//go:embed assets/*
+	assetsFS embed.FS
 )
 
 type Server interface {
@@ -22,7 +28,7 @@ type server struct {
 }
 
 func NewServer(ctx context.Context, conf entities.Config, services *composition.ServerServices) (Server, error) {
-	r, err := router.NewRouter(ctx, conf, services)
+	r, err := router.NewRouter(ctx, conf, services, assetsFS)
 	if err != nil {
 		return nil, err
 	}
