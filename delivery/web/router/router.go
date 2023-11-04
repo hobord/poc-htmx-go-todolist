@@ -12,7 +12,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func NewRouter(ctx context.Context, conf entities.Config, services *composition.ServerServices, assets fs.FS) (http.Handler, error) {
+func NewRouter(ctx context.Context, conf entities.ServerConfig, services *composition.ServerServices, assets fs.FS) (http.Handler, error) {
 	router := httprouter.New()
 
 	// static assets

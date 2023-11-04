@@ -7,34 +7,49 @@ import (
 	"syscall"
 
 	"github.com/hobord/poc-htmx-go-todolist/composition"
+	"github.com/hobord/poc-htmx-go-todolist/dal/config/viper"
 	"github.com/hobord/poc-htmx-go-todolist/delivery/web"
 	"github.com/hobord/poc-htmx-go-todolist/services/config"
 )
 
 func main() {
+	if err := run(); err != nil {
+		os.Exit(1)
+	}
+}
+
+func run() error {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 
 	defer cancel()
 
-	conf, err := config.NewConfig()
+	v := viper.NewReader()
+	config := config.NewService(v)
+
+	conf, err := config.GetServerConfig()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	services, err := composition.NewServerServices(ctx, *conf)
+	services, err := composition.NewServerServices(ctx, conf)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	webServer, err := web.NewServer(ctx, *conf, services)
+	log := services.Log
+
+	webServer, err := web.NewServer(ctx, conf, services)
 	if err != nil {
-		panic(err)
+		log.Error("Could not create web server", "error", err)
+		return err
 	}
 
+	log.Info("Starting server", "httpPort", conf.HttpPort)
 	err = webServer.Start(ctx)
 	if err != nil {
-		panic(err)
+		log.Error("Could not start web server", "error", err)
+		return err
 	}
 
 	// Make a channel to listen for an interrupt or terminate signal from the OS.
@@ -46,6 +61,11 @@ func main() {
 
 	err = webServer.Stop(ctx)
 	if err != nil {
-		panic(err)
+		log.Error("Could not stop web server", "error", err)
+		return err
 	}
+
+	log.Info("Server stopped")
+
+	return nil
 }

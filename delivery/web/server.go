@@ -27,7 +27,7 @@ type server struct {
 	httpServer http.Server
 }
 
-func NewServer(ctx context.Context, conf entities.Config, services *composition.ServerServices) (Server, error) {
+func NewServer(ctx context.Context, conf entities.ServerConfig, services *composition.ServerServices) (Server, error) {
 	r, err := router.NewRouter(ctx, conf, services, assetsFS)
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func NewServer(ctx context.Context, conf entities.Config, services *composition.
 	return &server{
 		services: services,
 		httpServer: http.Server{
-			Addr:    fmt.Sprintf(":%d", conf.HtttPort),
+			Addr:    fmt.Sprintf(":%d", conf.HttpPort),
 			Handler: r,
 			BaseContext: func(listener net.Listener) context.Context {
 				return ctx

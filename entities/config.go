@@ -1,5 +1,5 @@
 package entities
 
-type Config struct {
-	HtttPort int
+type ServerConfig struct {
+	HttpPort int
 }
