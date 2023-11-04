@@ -45,7 +45,6 @@ func run() error {
 		return err
 	}
 
-	log.Info("Starting server", "httpPort", conf.HttpPort)
 	err = webServer.Start(ctx)
 	if err != nil {
 		log.Error("Could not start web server", "error", err)

@@ -46,9 +46,13 @@ func NewServer(ctx context.Context, conf entities.ServerConfig, services *compos
 }
 
 func (s *server) Start(ctx context.Context) error {
+	s.services.Log.Info("Starting server", "httpPort", s.httpServer.Addr)
+
 	return s.httpServer.ListenAndServe()
 }
 
 func (s *server) Stop(ctx context.Context) error {
+	s.services.Log.Info("Stopping server")
+
 	return s.httpServer.Shutdown(ctx)
 }
