@@ -1,6 +1,11 @@
 package layouts
 
-templ IndexPage() {
+import (
+"github.com/hobord/poc-htmx-go-todolist/entities"
+"github.com/hobord/poc-htmx-go-todolist/delivery/web/templates/components"
+)
+
+templ IndexPage(groups map[string][]*entities.Todo) {
 <html>
   <head>
     <title>To Do List</title>
@@ -9,22 +14,7 @@ templ IndexPage() {
 
   </head>
   <body>
-    <div id="container">
-      <div id="header">
-        <h1>Todo Header</h1>
-      </div>
-      <div id="content">
-        <div id="left">
-          <h2>Left</h2>
-        </div>
-        <div id="right">
-          <h2>Right</h2>
-        </div>
-      </div>
-      <div id="footer">
-        <h1>Footer</h1>
-      </div>
-    </div>
+    @components.ListTodoGroups(groups)
   </body>
 </html>
 }
