@@ -4,20 +4,25 @@ import (
 	"net/http"
 
 	"github.com/hobord/poc-htmx-go-todolist/delivery/web/templates/layouts"
-	"github.com/hobord/poc-htmx-go-todolist/entities"
+	"github.com/hobord/poc-htmx-go-todolist/services/todo"
 )
 
 type handler struct {
+	todoService todo.Service
 }
 
-func NewHandler() Handler {
-	return &handler{}
+func NewHandler(todoService todo.Service) Handler {
+	return &handler{
+		todoService: todoService,
+	}
 }
 
 func (h *handler) IndexPage(w http.ResponseWriter, r *http.Request) {
-	var todos map[string][]*entities.Todo
-
-	// TODO: get todos from database
+	todos, err := h.todoService.GetAllGroup("user1")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	layout := layouts.IndexPage(todos)
 

@@ -7,15 +7,18 @@ import (
 
 	"github.com/hobord/poc-htmx-go-todolist/entities"
 	"github.com/hobord/poc-htmx-go-todolist/services/logger"
+	"github.com/hobord/poc-htmx-go-todolist/services/todo"
 )
 
 type ServerServices struct {
-	Log logger.Logger
+	Log         logger.Logger
+	TodoService todo.Service
 }
 
 func NewServerServices(ctx context.Context, conf entities.ServerConfig) (*ServerServices, error) {
 	log := slog.New(slog.NewTextHandler(os.Stderr, nil))
 	return &ServerServices{
-		Log: log,
+		Log:         log,
+		TodoService: createMockTodoService(),
 	}, nil
 }

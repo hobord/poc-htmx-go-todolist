@@ -23,7 +23,7 @@ func NewRouter(ctx context.Context, conf entities.ServerConfig, services *compos
 	router.HandlerFunc(http.MethodGet, "/health", healthCheck.Health)
 
 	// index
-	indexHandler := index.NewHandler()
+	indexHandler := index.NewHandler(services.TodoService)
 	router.HandlerFunc(http.MethodGet, "/", indexHandler.IndexPage)
 
 	return router, nil
