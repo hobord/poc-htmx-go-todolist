@@ -28,7 +28,7 @@ type server struct {
 }
 
 func NewServer(ctx context.Context, conf entities.ServerConfig, services *composition.ServerServices) (Server, error) {
-	apiHandler, err := api.BuildHandler(ctx, conf, services, assetsFS)
+	apiHandler, err := api.CreateHandler(ctx, conf, services, assetsFS)
 	if err != nil {
 		return nil, err
 	}
