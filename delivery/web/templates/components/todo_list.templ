@@ -1,0 +1,16 @@
+package components
+
+import "github.com/hobord/poc-htmx-go-todolist/entities"
+
+templ TodoList(title string, todos []*entities.Todo) {
+  <div>
+    <h2>{title}</h2>
+    <ul>
+    for _, todo := range todos {
+      @TodoItem(todo)
+    }
+    </ul>
+    <input type="text" id="{title}"/>
+  </div>
+}
+

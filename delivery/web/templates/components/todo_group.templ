@@ -1,0 +1,11 @@
+package components
+
+import "github.com/hobord/poc-htmx-go-todolist/entities"
+
+templ ListTodoGroups(groups map[string][]*entities.Todo) {
+  <div class="todo_groups">
+  for title, todos := range groups {
+    @TodoList(title, todos)
+  }
+  </div>
+}
