@@ -16,10 +16,20 @@ type handler struct {
 	service health.Service
 }
 
-func NewCheck(service health.Service) Handler {
-	return &handler{
+func NewCheck(service health.Service) (Handler, error) {
+	h := &handler{
 		service: service,
 	}
+
+	return h, h.validate()
+}
+
+func (h *handler) validate() error {
+	if h.service == nil {
+		return fmt.Errorf("service is nil")
+	}
+
+	return nil
 }
 
 func (h *handler) Health(w http.ResponseWriter, _ *http.Request) {
