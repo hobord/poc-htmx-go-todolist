@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/justinas/alice"
 
 	"github.com/hobord/poc-htmx-go-todolist/composition"
 	"github.com/hobord/poc-htmx-go-todolist/delivery/web/handler/health"
@@ -27,7 +28,10 @@ func CreateHandler(ctx context.Context, conf entities.ServerConfig, services *co
 
 	// index
 	indexHandler := index.NewHandler(services.TodoService)
-	api.HandlerFunc(http.MethodGet, "/", indexHandler.IndexPage)
+	api.Handler(http.MethodGet, "/",
+		alice.New(middleware.Logger).
+			Then(router.HandlerFunc(indexHandler.IndexPage)),
+	)
 
 	testGroup := router.NewGroup(api, "/test")
 
