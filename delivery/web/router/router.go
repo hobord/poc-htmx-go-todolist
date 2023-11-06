@@ -14,20 +14,20 @@ var (
 
 type Group struct {
 	router     *httprouter.Router
-	path       string
+	prefix       string
 	midlewares alice.Chain
 }
 
-func NewGroup(router *httprouter.Router, path string) *Group {
+func NewGroup(router *httprouter.Router, prefix string) *Group {
 	return &Group{
 		router:     router,
-		path:       path,
+		prefix:       prefix,
 		midlewares: alice.New(),
 	}
 }
 
 func (rg *Group) Group(path string) *Group {
-	group := NewGroup(rg.router, fmt.Sprintf("%s%s", rg.path, path))
+	group := NewGroup(rg.router, fmt.Sprintf("%s%s", rg.prefix, path))
 	group.midlewares = rg.midlewares
 
 	return group
@@ -40,7 +40,7 @@ func (rg *Group) WithMiddlewares(middleware ...alice.Constructor) *Group {
 }
 
 func (rg *Group) Handler(method, path string, handler http.Handler) {
-	rg.router.Handler(method, fmt.Sprintf("%s%s", rg.path, path), rg.midlewares.Then(handler))
+	rg.router.Handler(method, fmt.Sprintf("%s%s", rg.prefix, path), rg.midlewares.Then(handler))
 }
 
 func (rg *Group) GET(path string, handler http.HandlerFunc) {

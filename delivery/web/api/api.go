@@ -26,20 +26,27 @@ func CreateHandler(ctx context.Context, conf entities.ServerConfig, services *co
 	healthCheck := health.NewCheck(services.HealthService)
 	api.HandlerFunc(http.MethodGet, "/health", healthCheck.Health)
 
+	// empty prefix for root level
+	root := router.NewGroup(api, "").
+		WithMiddlewares(middleware.Logger)
+
 	// index
 	indexHandler := index.NewHandler(services.TodoService)
-	api.Handler(http.MethodGet, "/",
-		alice.New(middleware.Logger).
-			Then(router.HandlerFunc(indexHandler.IndexPage)),
-	)
+	root.GET("/", indexHandler.IndexPage)
 
-	testGroup := router.NewGroup(api, "/test")
+	// api.Handler(http.MethodGet, "/",
+	// 	alice.New(middleware.Logger).
+	// 		Then(router.HandlerFunc(indexHandler.IndexPage)),
+	// )
+
+	testGroup := root.Group("/test")
 
 	testGroup.GET("/page", indexHandler.IndexPage)
 
-	sub := testGroup.Group("/sub").
-		WithMiddlewares(middleware.Logger)
+	sub := testGroup.Group("/sub") // .WithMiddlewares(middleware.Logger)
 	sub.GET("/page", indexHandler.IndexPage)
 
-	return api, nil
+	r := alice.New(middleware.PanicRecovery).Then(api)
+
+	return r, nil
 }
