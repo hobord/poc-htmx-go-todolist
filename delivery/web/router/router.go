@@ -1,30 +1,29 @@
 package router
 
 import (
-	"context"
-	"io/fs"
 	"net/http"
 
-	"github.com/hobord/poc-htmx-go-todolist/composition"
-	"github.com/hobord/poc-htmx-go-todolist/delivery/web/handler/health"
-	"github.com/hobord/poc-htmx-go-todolist/delivery/web/handler/index"
-	"github.com/hobord/poc-htmx-go-todolist/entities"
 	"github.com/julienschmidt/httprouter"
 )
 
-func NewRouter(ctx context.Context, conf entities.ServerConfig, services *composition.ServerServices, assets fs.FS) (http.Handler, error) {
-	router := httprouter.New()
+var (
+	ParamsFromContext = httprouter.ParamsFromContext
+)
 
-	// static assets
-	router.Handler(http.MethodGet, "/assets/*path", http.FileServer(http.FS(assets)))
+type RouteGroup struct {
+	router     *httprouter.Router
+	path       string
+	midlewares []http.HandlerFunc
+	groups     []*RouteGroup
+	handlers   []func()
+}
 
-	// health check
-	healthCheck := health.NewCheck()
-	router.HandlerFunc(http.MethodGet, "/health", healthCheck.Health)
+func NewRouteGroup(router *httprouter.Router, path string, midlewares ...http.HandlerFunc) *RouteGroup {
+	return &RouteGroup{
+		router: router,
+	}
+}
 
-	// index
-	indexHandler := index.NewHandler(services.TodoService)
-	router.HandlerFunc(http.MethodGet, "/", indexHandler.IndexPage)
-
-	return router, nil
+func (rg *RouteGroup) GET(path string, handle httprouter.Handle) {
+	rg.router.GET(path, handle)
 }

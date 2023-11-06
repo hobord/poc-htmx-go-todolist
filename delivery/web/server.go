@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/hobord/poc-htmx-go-todolist/composition"
-	"github.com/hobord/poc-htmx-go-todolist/delivery/web/router"
+	"github.com/hobord/poc-htmx-go-todolist/delivery/web/api"
 	"github.com/hobord/poc-htmx-go-todolist/entities"
 )
 
@@ -28,7 +28,7 @@ type server struct {
 }
 
 func NewServer(ctx context.Context, conf entities.ServerConfig, services *composition.ServerServices) (Server, error) {
-	r, err := router.NewRouter(ctx, conf, services, assetsFS)
+	apiHandler, err := api.BuildHandler(ctx, conf, services, assetsFS)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func NewServer(ctx context.Context, conf entities.ServerConfig, services *compos
 		services: services,
 		httpServer: http.Server{
 			Addr:    fmt.Sprintf(":%d", conf.HttpPort),
-			Handler: r,
+			Handler: apiHandler,
 			BaseContext: func(listener net.Listener) context.Context {
 				return ctx
 			},
