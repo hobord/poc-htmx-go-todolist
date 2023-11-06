@@ -28,7 +28,7 @@ func CreateHandler(ctx context.Context, conf entities.ServerConfig, services *co
 
 	// empty prefix for root level
 	root := router.NewGroup(api, "").
-		WithMiddlewares(middleware.Logger)
+		WithMiddlewares(middleware.WithLogger(services.Log))
 
 	// index
 	indexHandler := index.NewHandler(services.TodoService)

@@ -18,7 +18,8 @@ type ServerServices struct {
 }
 
 func NewServerServices(ctx context.Context, conf entities.ServerConfig) (*ServerServices, error) {
-	log := slog.New(slog.NewTextHandler(os.Stderr, nil))
+	log := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug}))
+
 	return &ServerServices{
 		Log:           log,
 		HealthService: createMockHealtService(),
