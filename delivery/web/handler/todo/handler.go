@@ -48,7 +48,12 @@ func (h *handler) AddItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	content := components.TodoList("title", todos)
+	var title string
+	if len(todos) > 0 {
+		title = todos[0].Group
+	}
+
+	content := components.TodoList(title, todos)
 
 	if err := content.Render(r.Context(), w); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
