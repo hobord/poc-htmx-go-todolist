@@ -13,8 +13,18 @@ type MockHandler struct {
 	mock.Mock
 }
 
-// IndexPage provides a mock function with given fields: w, r
-func (_m *MockHandler) IndexPage(w http.ResponseWriter, r *http.Request) {
+// TodoItem provides a mock function with given fields: w, r
+func (_m *MockHandler) TodoItem(w http.ResponseWriter, r *http.Request) {
+	_m.Called(w, r)
+}
+
+// TodoItems provides a mock function with given fields: w, r
+func (_m *MockHandler) TodoItems(w http.ResponseWriter, r *http.Request) {
+	_m.Called(w, r)
+}
+
+// TodoLists provides a mock function with given fields: w, r
+func (_m *MockHandler) TodoLists(w http.ResponseWriter, r *http.Request) {
 	_m.Called(w, r)
 }
 
