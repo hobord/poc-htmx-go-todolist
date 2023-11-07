@@ -58,6 +58,12 @@ func CreateHandler(ctx context.Context, conf entities.ServerConfig, services *co
 		// 		Then(router.HandlerFunc(indexHandler.IndexPage)),
 		// )
 
+		// todos
+		{
+			todos := root.Group("/todos")
+			todos.GET("/", indexHandler.IndexPage)
+		}
+
 		// test
 		{
 			testGroup := root.Group("/test")
