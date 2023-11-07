@@ -11,6 +11,7 @@ import (
 	"github.com/hobord/poc-htmx-go-todolist/composition"
 	"github.com/hobord/poc-htmx-go-todolist/delivery/web/handler/health"
 	"github.com/hobord/poc-htmx-go-todolist/delivery/web/handler/index"
+	"github.com/hobord/poc-htmx-go-todolist/delivery/web/handler/todo"
 	"github.com/hobord/poc-htmx-go-todolist/delivery/web/middleware"
 	"github.com/hobord/poc-htmx-go-todolist/delivery/web/router"
 	"github.com/hobord/poc-htmx-go-todolist/entities"
@@ -60,8 +61,16 @@ func CreateHandler(ctx context.Context, conf entities.ServerConfig, services *co
 
 		// todos
 		{
+			todoHandler, err := todo.NewHandler(services.TodoService)
+			if err != nil {
+				return nil, err
+			}
+
 			todos := root.Group("/todos")
 			todos.GET("/", indexHandler.IndexPage)
+
+			// add todo
+			todos.POST("/add", todoHandler.AddItem)
 		}
 
 		// test

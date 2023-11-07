@@ -13,6 +13,11 @@ type MockHandler struct {
 	mock.Mock
 }
 
+// AddItem provides a mock function with given fields: w, r
+func (_m *MockHandler) AddItem(w http.ResponseWriter, r *http.Request) {
+	_m.Called(w, r)
+}
+
 // TodoItem provides a mock function with given fields: w, r
 func (_m *MockHandler) TodoItem(w http.ResponseWriter, r *http.Request) {
 	_m.Called(w, r)

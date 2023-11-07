@@ -31,6 +31,11 @@ func createMockTodoService() todo.Service {
 			"Group1": todoItems,
 		}, nil)
 
+	service.On("GetByGroup", mock.Anything, mock.Anything).Return(
+		todoItems, nil)
+
+	service.On("Create", mock.Anything).Return(nil)
+
 	return service
 }
 

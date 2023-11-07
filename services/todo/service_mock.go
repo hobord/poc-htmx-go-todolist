@@ -12,32 +12,30 @@ type MockService struct {
 	mock.Mock
 }
 
-// Create provides a mock function with given fields: _a0
-func (_m *MockService) Create(_a0 *entities.Todo) error {
-	ret := _m.Called(_a0)
+// Create provides a mock function with given fields: user, group, title
+func (_m *MockService) Create(user string, group string, title string) (*entities.Todo, error) {
+	ret := _m.Called(user, group, title)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(*entities.Todo) error); ok {
-		r0 = rf(_a0)
+	var r0 *entities.Todo
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, string, string) (*entities.Todo, error)); ok {
+		return rf(user, group, title)
+	}
+	if rf, ok := ret.Get(0).(func(string, string, string) *entities.Todo); ok {
+		r0 = rf(user, group, title)
 	} else {
-		r0 = ret.Error(0)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entities.Todo)
+		}
 	}
 
-	return r0
-}
-
-// Delete provides a mock function with given fields: id
-func (_m *MockService) Delete(id string) error {
-	ret := _m.Called(id)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string) error); ok {
-		r0 = rf(id)
+	if rf, ok := ret.Get(1).(func(string, string, string) error); ok {
+		r1 = rf(user, group, title)
 	} else {
-		r0 = ret.Error(0)
+		r1 = ret.Error(1)
 	}
 
-	return r0
+	return r0, r1
 }
 
 // GetAll provides a mock function with given fields: user
@@ -116,74 +114,6 @@ func (_m *MockService) GetByGroup(user string, group string) ([]*entities.Todo, 
 	}
 
 	return r0, r1
-}
-
-// GetByID provides a mock function with given fields: id
-func (_m *MockService) GetByID(id string) (*entities.Todo, error) {
-	ret := _m.Called(id)
-
-	var r0 *entities.Todo
-	var r1 error
-	if rf, ok := ret.Get(0).(func(string) (*entities.Todo, error)); ok {
-		return rf(id)
-	}
-	if rf, ok := ret.Get(0).(func(string) *entities.Todo); ok {
-		r0 = rf(id)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*entities.Todo)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(string) error); ok {
-		r1 = rf(id)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// SetCompleted provides a mock function with given fields: id, completed
-func (_m *MockService) SetCompleted(id string, completed bool) error {
-	ret := _m.Called(id, completed)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string, bool) error); ok {
-		r0 = rf(id, completed)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// SetPriority provides a mock function with given fields: _a0, higher, from, to
-func (_m *MockService) SetPriority(_a0 string, higher string, from string, to string) error {
-	ret := _m.Called(_a0, higher, from, to)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(string, string, string, string) error); ok {
-		r0 = rf(_a0, higher, from, to)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// Update provides a mock function with given fields: _a0
-func (_m *MockService) Update(_a0 *entities.Todo) error {
-	ret := _m.Called(_a0)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(*entities.Todo) error); ok {
-		r0 = rf(_a0)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
 }
 
 // NewMockService creates a new instance of MockService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
