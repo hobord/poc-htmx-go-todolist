@@ -16,7 +16,7 @@ type Attr struct {
 	Value any
 }
 
-//go:generate mockery --name Logger --structname MockLogger --output . --outpkg logger --case underscore --filename logger_mock.go
+//go:generate mockery --name Logger --structname MockLogger --inpackage --case underscore --disable-version-string
 type Logger interface {
 	Debug(msg string, args ...any)
 	DebugContext(ctx context.Context, msg string, args ...any)

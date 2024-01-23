@@ -29,7 +29,7 @@ func NewServerServices(ctx context.Context, conf entities.ServerConfig) (*Server
 
 	return &ServerServices{
 		Log:           log,
-		HealthService: createMockHealtService(),
+		HealthService: nil,
 		TodoService:   todoService, //createMockTodoService(),
 	}, nil
 }

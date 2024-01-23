@@ -1,6 +1,8 @@
 package todo
 
-import "github.com/hobord/poc-htmx-go-todolist/dal/todo"
+import (
+	"github.com/hobord/poc-htmx-go-todolist/dal/todo"
+)
 
 type service struct {
 	dal todo.ReaderWriter

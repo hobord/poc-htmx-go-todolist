@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/hobord/poc-htmx-go-todolist/delivery/web/templates/layouts"
+	"github.com/hobord/poc-htmx-go-todolist/delivery/web/templates/views"
 	"github.com/hobord/poc-htmx-go-todolist/services/todo"
 )
 
@@ -29,15 +29,15 @@ func (h *handler) validate() error {
 }
 
 func (h *handler) IndexPage(w http.ResponseWriter, r *http.Request) {
-	todos, err := h.todoService.GetAllGroup("user1")
+	groups, err := h.todoService.GetTodoGroupsByUserID("")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	layout := layouts.IndexPage(todos)
+	view := views.IndexPage(groups)
 
-	if err := layout.Render(r.Context(), w); err != nil {
+	if err := view.Render(r.Context(), w); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

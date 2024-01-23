@@ -5,25 +5,30 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
-	"github.com/justinas/alice"
+	chi "github.com/go-chi/chi/v5"
 )
 
 var (
-	ParamsFromContext = httprouter.ParamsFromContext
+	ParamsFromURL = func(r *http.Request, key string) string {
+		return chi.URLParam(r, key)
+	}
 )
 
-type Group struct {
-	router     *httprouter.Router
-	prefix     string
-	midlewares alice.Chain
+func NewRouter() chi.Router {
+	return chi.NewRouter()
 }
 
-func NewGroup(router *httprouter.Router, prefix string) *Group {
+type Group struct {
+	router     chi.Router
+	prefix     string
+	midlewares []func(http.Handler) http.Handler
+}
+
+func NewGroup(router chi.Router, prefix string) *Group {
 	return &Group{
 		router:     router,
 		prefix:     prefix,
-		midlewares: alice.New(),
+		midlewares: make([]func(http.Handler) http.Handler, 0),
 	}
 }
 
@@ -34,15 +39,16 @@ func (g *Group) Group(path string) *Group {
 	return group
 }
 
-func (g *Group) WithMiddlewares(middleware ...alice.Constructor) *Group {
-	g.midlewares = g.midlewares.Append(middleware...)
+func (g *Group) WithMiddlewares(middleware ...func(http.Handler) http.Handler) *Group {
+	g.midlewares = append(g.midlewares, middleware...)
 
 	return g
 }
 
 func (g *Group) Handler(method, path string, handler http.Handler) {
 	slog.Info("Register handler", "method", method, "path", fmt.Sprintf("%s%s", g.prefix, path))
-	g.router.Handler(method, fmt.Sprintf("%s%s", g.prefix, path), g.midlewares.Then(handler))
+
+	g.router.With(g.midlewares...).Method(method, fmt.Sprintf("%s%s", g.prefix, path), handler)
 }
 
 func (g *Group) GET(path string, handler http.HandlerFunc) {

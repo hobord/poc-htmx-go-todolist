@@ -5,17 +5,21 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./tmp/main"
-  pre_cmd = ["templ generate ./..."]
+  pre_cmd = [
+    "templ generate ./...",
+    # "go generate ./...",
+    # "tailwindcss -i ./delivery/web/css/main.css -o ./delivery/web/assets/css/main.css" 
+  ]
   cmd = "go build -o ./tmp/main ./cmd/server/."
   delay = 1000
-  exclude_dir = ["assets", "tmp", "vendor", "testdata"]
+  exclude_dir = ["assets", "tmp", "vendor", "testdata", "delivery/web/assets"]
   exclude_file = []
   exclude_regex = ["_test\\.go", ".*_templ\\.go"]
   exclude_unchanged = false
   follow_symlink = false
   # full_bin = ""
   # include_dir = []
-  include_ext = ["go", "tpl", "tmpl", "html", "templ"]
+  include_ext = ["go", "tpl", "tmpl", "html", "templ", "css"]
   # include_file = []
   kill_delay = "1s"
   log = "build-errors.log"

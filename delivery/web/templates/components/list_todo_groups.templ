@@ -1,0 +1,23 @@
+package components
+
+import "github.com/hobord/poc-htmx-go-todolist/entities"
+
+templ ListTodoGroups(groups []*entities.TodoGroup) {
+  <div class="todo_groups">
+    for _, group := range groups {
+        @TodoGroup(group)
+    }
+  <form 
+    hx-post="/todo-group/create"
+    hx-target=".todo_groups"
+    >
+      <input name="title"/>
+      <select name="color">
+        <option value="white">White</option>
+        <option value="red">Red</option>
+        <option value="green">Green</option>
+      </select>
+      <button type="submit">add</button>
+    </form>
+  </div>
+}

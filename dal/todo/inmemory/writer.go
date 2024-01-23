@@ -10,89 +10,87 @@ func generateID() string {
 	return id.String()
 }
 
-func (d *dal) Create(todo *entities.Todo) error {
+func (d *dal) WriteTodoGroup(todoGroup *entities.TodoGroup) error {
 	d.lck.Lock()
 	defer d.lck.Unlock()
 
-	if d.data[todo.User] == nil {
-		d.data[todo.User] = make(map[string][]*entities.Todo)
+	if todoGroup.ID == "" {
+		todoGroup.ID = generateID()
 	}
 
-	if d.data[todo.User][todo.Group] == nil {
-		d.data[todo.User][todo.Group] = make([]*entities.Todo, 0, 10)
-	}
+	dto := toGroupDTO(todoGroup)
 
-	todo.ID = generateID()
-
-	d.data[todo.User][todo.Group] = append(d.data[todo.User][todo.Group], todo)
-
-	return nil
-}
-
-func (d *dal) Update(todo *entities.Todo) error {
-	d.lck.Lock()
-	defer d.lck.Unlock()
-
-	if d.data[todo.User] == nil || d.data[todo.User][todo.Group] == nil {
-		return nil
-	}
-
-	originalTodo, err := d.GetByID(todo.ID)
-	if err != nil {
+	if err := d.writeTodoGroup(dto); err != nil {
 		return err
 	}
 
-	if originalTodo.Group != todo.Group {
-		d.data[originalTodo.User][originalTodo.Group] = remove(d.data[originalTodo.User][originalTodo.Group], originalTodo)
+	if len(todoGroup.Todos) > 0 {
+		d.wirteTodoItems(todoGroup.Todos)
 	}
-
-	d.data[todo.User][todo.Group] = append(d.data[todo.User][todo.Group], todo)
 
 	return nil
 }
 
-func remove(todos []*entities.Todo, todo *entities.Todo) []*entities.Todo {
-	for i, t := range todos {
-		if t.ID == todo.ID {
-			return append(todos[:i], todos[i+1:]...)
+func (d *dal) writeTodoGroup(dto groupDTO) error {
+	d.groups[dto.ID] = dto
+
+	return nil
+}
+
+func (d *dal) DeleteTodoGroup(todoGroupID string) error {
+	d.lck.Lock()
+	defer d.lck.Unlock()
+
+	delete(d.groups, todoGroupID)
+
+	return d.deleteTodoItemsByGroupID(todoGroupID)
+}
+
+func (d *dal) deleteTodoItemsByGroupID(todoGroupID string) error {
+	for i, item := range d.items {
+		if item.GroupID == todoGroupID {
+			delete(d.items, i)
 		}
 	}
-	return todos
-}
-
-func (d *dal) Delete(id string) error {
-	d.lck.Lock()
-	defer d.lck.Unlock()
-
-	tudo, err := d.GetByID(id)
-	if err != nil {
-		return err
-	}
-
-	d.data[tudo.User][tudo.Group] = remove(d.data[tudo.User][tudo.Group], tudo)
 
 	return nil
 }
 
-func (d *dal) SetCompleted(id string, completed bool) error {
+func (d *dal) WriteTodoItem(todoItem *entities.TodoItem) error {
 	d.lck.Lock()
 	defer d.lck.Unlock()
 
-	todo, err := d.GetByID(id)
-	if err != nil {
-		return err
+	if todoItem.ID == "" {
+		todoItem.ID = generateID()
 	}
 
-	todo.Completed = completed
+	dto := toItemDTO(todoItem)
+
+	return d.writeItem(dto)
+}
+
+func (d *dal) wirteTodoItems(todoItems []*entities.TodoItem) error {
+	for _, todoItem := range todoItems {
+		item := toItemDTO(todoItem)
+		if err := d.writeItem(item); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
 
-func (d *dal) SetPriority(todos []*entities.Todo) error {
+func (d *dal) writeItem(dto itemDTO) error {
+	d.items[dto.ID] = dto
+
+	return nil
+}
+
+func (d *dal) DeleteTodoItem(todoItemID string) error {
 	d.lck.Lock()
 	defer d.lck.Unlock()
 
-	// TODO: implement
+	delete(d.items, todoItemID)
 
 	return nil
 }

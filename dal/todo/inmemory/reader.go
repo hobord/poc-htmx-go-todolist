@@ -1,43 +1,58 @@
 package inmemory
 
 import (
-	"fmt"
-
 	"github.com/hobord/poc-htmx-go-todolist/entities"
 )
 
-func (d *dal) GetByID(id string) (*entities.Todo, error) {
-	d.lck.RLock()
-	defer d.lck.RUnlock()
+func (d *dal) GetTodoGroupsByUserID(userID string) ([]*entities.TodoGroup, error) {
+	d.lck.RLocker().Lock()
+	defer d.lck.RLocker().Unlock()
 
-	for _, group := range d.data {
-		for _, todos := range group {
-			for _, todo := range todos {
-				if todo.ID == id {
-					return todo, nil
-				}
-			}
+	var todoGroups []*entities.TodoGroup
+
+	for _, g := range d.groups {
+		if g.UserID == userID {
+			todoGroup := g.toGroupEntity()
+			todoGroup.Todos = d.getItemsByGroupID(g.ID)
+
+			todoGroups = append(todoGroups, todoGroup)
 		}
 	}
 
-	return nil, fmt.Errorf("todo not found")
+	return todoGroups, nil
 }
 
-func (d *dal) GetAll(user string) ([]*entities.Todo, error) {
-	d.lck.RLock()
-	defer d.lck.RUnlock()
+func (d *dal) GetTodoGroupByID(todoGroupID string) (*entities.TodoGroup, error) {
+	d.lck.RLocker().Lock()
+	defer d.lck.RLocker().Unlock()
 
-	todos := make([]*entities.Todo, 0, 10)
-	for _, group := range d.data[user] {
-		todos = append(todos, group...)
+	g, ok := d.groups[todoGroupID]
+	if !ok {
+		return nil, entities.ErrNotFound
 	}
 
-	return todos, nil
+	todoGroup := g.toGroupEntity()
+	todoGroup.Todos = d.getItemsByGroupID(g.ID)
+
+	return todoGroup, nil
 }
 
-func (d *dal) GetByGroup(user string, group string) ([]*entities.Todo, error) {
-	d.lck.RLock()
-	defer d.lck.RUnlock()
+func (d *dal) getTodoItemById(todoItemID string) (itemDTO, error) {
+	if todoItem, ok := d.items[todoItemID]; ok {
+		return todoItem, nil
+	}
 
-	return d.data[user][group], nil
+	return itemDTO{}, entities.ErrNotFound
+}
+
+func (d *dal) getItemsByGroupID(groupID string) []*entities.TodoItem {
+	var items []*entities.TodoItem
+
+	for _, item := range d.items {
+		if item.GroupID == groupID {
+			items = append(items, item.toItemEntity())
+		}
+	}
+
+	return items
 }

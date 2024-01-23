@@ -5,7 +5,6 @@ import (
 	"io/fs"
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
 
 	"github.com/hobord/poc-htmx-go-todolist/composition"
@@ -22,21 +21,23 @@ func CreateHandler(ctx context.Context, conf entities.ServerConfig, services *co
 
 	log.Debug("Create http routing handlers")
 
-	api := httprouter.New()
+	api := router.NewRouter()
 
 	// static assets
 	log.Debug("Register handler", "method", http.MethodGet, "path", "/assets/*path")
-	api.Handler(http.MethodGet, "/assets/*path", http.FileServer(http.FS(assets)))
+	api.Handle("/assets/*", http.FileServer(http.FS(assets)))
 
 	// health check
 	log.Debug("Register handler", "method", http.MethodGet, "path", "/health")
 
-	healthCheck, err := health.NewCheck(services.HealthService)
-	if err != nil {
-		return nil, err
-	}
+	if services.HealthService != nil {
+		healthCheck, err := health.NewCheck(services.HealthService)
+		if err != nil {
+			return nil, err
+		}
 
-	api.HandlerFunc(http.MethodGet, "/health", healthCheck.Health)
+		api.MethodFunc(http.MethodGet, "/health", healthCheck.Health)
+	}
 
 	// root
 	{
@@ -66,11 +67,20 @@ func CreateHandler(ctx context.Context, conf entities.ServerConfig, services *co
 				return nil, err
 			}
 
-			todos := root.Group("/todos")
+			todos := root.Group("/todo-group")
 			todos.GET("/", indexHandler.IndexPage)
 
-			// add todo
-			todos.POST("/add", todoHandler.AddItem)
+			// create todo group
+			todos.POST("/create", todoHandler.CreateTodoGroup)
+
+			// delete todo group
+			todos.DELETE("/{groupID}", todoHandler.DeleteTodoGroup)
+
+			// add todo item
+			todos.POST("/{groupID}/add-todo", todoHandler.CreateItem)
+
+			// delete todo item
+			todos.DELETE("/{groupID}/{itemID}", todoHandler.DeleteItem)
 		}
 
 		// test

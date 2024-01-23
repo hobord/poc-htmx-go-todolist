@@ -4,6 +4,7 @@ go 1.21.3
 
 require (
 	github.com/a-h/templ v0.2.432
+	github.com/go-chi/chi/v5 v5.0.11
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/justinas/alice v1.2.0
 	github.com/spf13/viper v1.17.0

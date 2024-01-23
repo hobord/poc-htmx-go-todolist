@@ -1,44 +1,54 @@
 package todo
 
-import "github.com/hobord/poc-htmx-go-todolist/entities"
+import (
+	"github.com/hobord/poc-htmx-go-todolist/entities"
+)
 
-func (s *service) Create(user, group, title string) (*entities.Todo, error) {
-	todo := &entities.Todo{
-		User:  user,
-		Group: group,
-		Title: title,
-	}
-
-	if err := s.dal.Create(todo); err != nil {
-		return nil, err
-	}
-
-	return todo, nil
+func (s *service) GetTodoGroupsByUserID(userID string) ([]*entities.TodoGroup, error) {
+	return s.dal.GetTodoGroupsByUserID(userID)
 }
 
-func (s *service) GetAll(user string) ([]*entities.Todo, error) {
-	return s.dal.GetAll(user)
+func (s *service) GetTodoGroupByID(todoGroupID string) (*entities.TodoGroup, error) {
+	return s.dal.GetTodoGroupByID(todoGroupID)
 }
 
-func (s *service) GetByGroup(user string, group string) ([]*entities.Todo, error) {
-	return s.dal.GetByGroup(user, group)
+func (s *service) CreateTodoGroup(todoGroup *entities.TodoGroup) error {
+	return s.dal.WriteTodoGroup(todoGroup)
 }
 
-func (s *service) GetAllGroup(user string) (map[string][]*entities.Todo, error) {
-	groups := make(map[string][]*entities.Todo)
+func (s *service) UpdateTodoGroup(todoGroup *entities.TodoGroup) error {
+	return s.dal.WriteTodoGroup(todoGroup)
+}
 
-	todos, err := s.dal.GetAll(user)
+func (s *service) DeleteTodoGroup(groupID string) error {
+	return s.dal.DeleteTodoGroup(groupID)
+}
+
+func (s *service) AddTodoItem(todoItem *entities.TodoItem) error {
+	return s.dal.WriteTodoItem(todoItem)
+}
+
+func (s *service) UpdateTodoItem(todoItem *entities.TodoItem) error {
+	return s.dal.WriteTodoItem(todoItem)
+}
+
+func (s *service) DeleteTodoItem(todoItemID string) error {
+	return s.dal.DeleteTodoItem(todoItemID)
+}
+
+func (s *service) DeleteCompletedTodoItems(groupID string) error {
+	group, err := s.dal.GetTodoGroupByID(groupID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	for _, todo := range todos {
-		if groups[todo.Group] == nil {
-			groups[todo.Group] = make([]*entities.Todo, 0, 10)
+	for _, todo := range group.Todos {
+		if todo.Completed {
+			if err := s.dal.DeleteTodoItem(todo.ID); err != nil {
+				return err
+			}
 		}
-
-		groups[todo.Group] = append(groups[todo.Group], todo)
 	}
 
-	return groups, nil
+	return nil
 }

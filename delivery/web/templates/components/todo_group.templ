@@ -1,11 +1,56 @@
 package components
 
-import "github.com/hobord/poc-htmx-go-todolist/entities"
+import (
+  "fmt"
+	"sort"
 
-templ ListTodoGroups(groups map[string][]*entities.Todo) {
-  <div class="todo_groups">
-  for title, todos := range groups {
-    @TodoList(title, todos)
-  }
+  "github.com/hobord/poc-htmx-go-todolist/entities"
+)
+
+func sortItems(items []*entities.TodoItem) []*entities.TodoItem {
+	sort.Slice(items, func(i, j int) bool {
+        return items[i].Priority < items[j].Priority
+	})
+
+  return items
+}
+
+templ TodoGroup(group *entities.TodoGroup) {
+  <div class={ "todo_group", templ.SafeClass(group.Color)} hx-target="this" >
+    <button
+        hx-delete={ fmt.Sprintf("/todo-group/%s", group.ID) }
+        hx-confirm="Are you sure?"
+    >
+        Delete
+    </button>
+    <div class="header">{group.Title}</div>
+    <div class="items"
+        hx-confirm="Are you sure?" 
+    >
+    for _, item := range sortItems(group.Todos) {
+        <div hx-target="this">
+            {item.Title}
+            <button 
+                hx-delete={ fmt.Sprintf("/todo-group/%s/%s", group.ID, item.ID) }
+            >
+                x
+            </button>
+        </div>
+    }
+    </div>
+    <form 
+        hx-post={ fmt.Sprintf("/todo-group/%s/add-todo", group.ID) }
+    >
+      <input name="title"/>
+      <input type="hidden" name="group_id" value={group.ID}/>
+      <select name="priority">
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+      </select>
+      <button type="submit">add</button>
+    </form>
   </div>
 }
+

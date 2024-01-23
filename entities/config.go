@@ -1,5 +1,6 @@
 package entities
 
 type ServerConfig struct {
-	HttpPort int
+	HttpPort   int
+	AssetsPath string
 }

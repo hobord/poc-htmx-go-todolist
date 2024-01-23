@@ -1,11 +1,11 @@
-package layouts
+package views
 
 import (
 	"github.com/hobord/poc-htmx-go-todolist/entities"
 	"github.com/hobord/poc-htmx-go-todolist/delivery/web/templates/components"
 )
 
-templ IndexPage(groups map[string][]*entities.Todo) {
+templ IndexPage(groups []*entities.TodoGroup) {
 	<html>
 		<head>
 			<title>To Do List</title>
