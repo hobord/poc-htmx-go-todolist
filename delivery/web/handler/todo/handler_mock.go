@@ -48,6 +48,11 @@ func (_m *MockHandler) GetTodoGroups(w http.ResponseWriter, r *http.Request) {
 	_m.Called(w, r)
 }
 
+// SortItems provides a mock function with given fields: w, r
+func (_m *MockHandler) SortItems(w http.ResponseWriter, r *http.Request) {
+	_m.Called(w, r)
+}
+
 // UpdateItem provides a mock function with given fields: w, r
 func (_m *MockHandler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 	_m.Called(w, r)

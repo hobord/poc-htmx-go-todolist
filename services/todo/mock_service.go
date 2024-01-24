@@ -162,6 +162,24 @@ func (_m *MockService) GetTodoGroupsByUserID(userID string) ([]*entities.TodoGro
 	return r0, r1
 }
 
+// SortTodoItems provides a mock function with given fields: ids
+func (_m *MockService) SortTodoItems(ids []string) error {
+	ret := _m.Called(ids)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SortTodoItems")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func([]string) error); ok {
+		r0 = rf(ids)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // UpdateTodoGroup provides a mock function with given fields: todoGroup
 func (_m *MockService) UpdateTodoGroup(todoGroup *entities.TodoGroup) error {
 	ret := _m.Called(todoGroup)
