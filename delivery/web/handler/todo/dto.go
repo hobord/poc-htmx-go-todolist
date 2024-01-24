@@ -97,3 +97,15 @@ func (dto *UpdateTodoItemRequest) Bind(r *http.Request) error {
 
 	return nil
 }
+
+type SortItemsRequest struct {
+	Items []string `json:"items"`
+}
+
+func (dto *SortItemsRequest) Bind(r *http.Request) error {
+	r.ParseForm()
+
+	dto.Items = r.Form["item"]
+
+	return nil
+}

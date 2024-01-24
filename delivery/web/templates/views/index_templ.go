@@ -46,6 +46,60 @@ func IndexPage(groups []*entities.TodoGroup) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</script><!--")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Var4 := ` jsDelivr :: Sortable :: Latest (https://www.jsdelivr.com/package/npm/sortablejs) `
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("--><script src=\"https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Var5 := ``
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</script><script>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Var6 := `
+      htmx.onLoad(function(content) {
+        var sortables = content.querySelectorAll(".sortable");
+        for (var i = 0; i < sortables.length; i++) {
+        var sortable = sortables[i];
+        var sortableInstance = new Sortable(sortable, {
+            animation: 150,
+            ghostClass: 'blue-background-class',
+
+            // Make the ` + "`" + `.htmx-indicator` + "`" + ` unsortable
+            filter: ".htmx-indicator",
+            onMove: function (evt) {
+                return evt.related.className.indexOf('htmx-indicator') === -1;
+            },
+
+            // Disable sorting on the ` + "`" + `end` + "`" + ` event
+            onEnd: function (evt) {
+                this.option("disabled", true);
+            }
+        });
+
+        // Re-enable sorting on the ` + "`" + `htmx:afterSwap` + "`" + ` event
+        sortable.addEventListener("htmx:afterSwap", function() {
+            sortableInstance.option("disabled", false);
+        });
+        }
+    })
+      `
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</script></head><body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

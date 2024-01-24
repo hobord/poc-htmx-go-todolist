@@ -35,7 +35,7 @@ func ListTodoGroups(groups []*entities.TodoGroup) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form hx-post=\"/todo-group/create\" hx-target=\".todo_groups\"><input name=\"title\"> <select name=\"color\"><option value=\"white\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form hx-post=\"/group/\" hx-target=\".todo_groups\"><input name=\"title\"> <select name=\"color\"><option value=\"white\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

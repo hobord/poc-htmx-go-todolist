@@ -9,6 +9,7 @@ type Handler interface {
 	GetTodoGroups(w http.ResponseWriter, r *http.Request)
 	UpdateTodoGroup(w http.ResponseWriter, r *http.Request)
 	DeleteTodoGroup(w http.ResponseWriter, r *http.Request)
+	SortItems(w http.ResponseWriter, r *http.Request)
 
 	CreateItem(w http.ResponseWriter, r *http.Request)
 	UpdateItem(w http.ResponseWriter, r *http.Request)

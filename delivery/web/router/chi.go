@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	ParamsFromURL = func(r *http.Request, key string) string {
+	PathValue = func(r *http.Request, key string) string {
 		return chi.URLParam(r, key)
 	}
 )

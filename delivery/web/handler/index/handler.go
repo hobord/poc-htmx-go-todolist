@@ -29,7 +29,7 @@ func (h *handler) validate() error {
 }
 
 func (h *handler) IndexPage(w http.ResponseWriter, r *http.Request) {
-	groups, err := h.todoService.GetTodoGroupsByUserID("")
+	groups, err := h.todoService.GetTodoGroupsByUserID("1")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

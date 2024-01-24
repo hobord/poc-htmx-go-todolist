@@ -8,7 +8,7 @@ templ ListTodoGroups(groups []*entities.TodoGroup) {
         @TodoGroup(group)
     }
   <form 
-    hx-post="/todo-group/create"
+    hx-post="/group/"
     hx-target=".todo_groups"
     >
       <input name="title"/>

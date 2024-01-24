@@ -22,11 +22,11 @@ func (d *dal) GetTodoGroupsByUserID(userID string) ([]*entities.TodoGroup, error
 	return todoGroups, nil
 }
 
-func (d *dal) GetTodoGroupByID(todoGroupID string) (*entities.TodoGroup, error) {
+func (d *dal) GetTodoGroupByID(groupID string) (*entities.TodoGroup, error) {
 	d.lck.RLocker().Lock()
 	defer d.lck.RLocker().Unlock()
 
-	g, ok := d.groups[todoGroupID]
+	g, ok := d.groups[groupID]
 	if !ok {
 		return nil, entities.ErrNotFound
 	}
@@ -37,8 +37,8 @@ func (d *dal) GetTodoGroupByID(todoGroupID string) (*entities.TodoGroup, error) 
 	return todoGroup, nil
 }
 
-func (d *dal) getTodoItemById(todoItemID string) (itemDTO, error) {
-	if todoItem, ok := d.items[todoItemID]; ok {
+func (d *dal) getTodoItemById(itemID string) (itemDTO, error) {
+	if todoItem, ok := d.items[itemID]; ok {
 		return todoItem, nil
 	}
 
@@ -55,4 +55,16 @@ func (d *dal) getItemsByGroupID(groupID string) []*entities.TodoItem {
 	}
 
 	return items
+}
+
+func (d *dal) GetTodoItemByID(id string) (*entities.TodoItem, error) {
+	d.lck.RLocker().Lock()
+	defer d.lck.RLocker().Unlock()
+
+	item, err := d.getTodoItemById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return item.toItemEntity(), nil
 }

@@ -1,7 +1,6 @@
 package todo
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/hobord/poc-htmx-go-todolist/delivery/web/router"
@@ -39,7 +38,6 @@ func (h *handler) CreateItem(w http.ResponseWriter, r *http.Request) {
 	if err := component.Render(r.Context(), w); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-
 }
 
 func (h *handler) UpdateItem(w http.ResponseWriter, r *http.Request) {
@@ -62,39 +60,53 @@ func (h *handler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "%+v", item)
-}
-
-func (h *handler) DeleteItem(w http.ResponseWriter, r *http.Request) {
-	groupID := router.ParamsFromURL(r, "groupID")
-	if groupID == "" {
+	group, err := h.todoService.GetTodoGroupByID(dto.GroupID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	itemID := router.ParamsFromURL(r, "itemID")
+	component := components.TodoGroup(group)
+
+	if err := component.Render(r.Context(), w); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (h *handler) DeleteItem(w http.ResponseWriter, r *http.Request) {
+	itemID := router.PathValue(r, "itemID")
 	if itemID == "" {
+		http.Error(w, "itemID is required", http.StatusInternalServerError)
 		return
 	}
 
 	if err := h.todoService.DeleteTodoItem(itemID); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
 func (h *handler) DeleteCompletedItems(w http.ResponseWriter, r *http.Request) {
-	groupID := router.ParamsFromURL(r, "groupID")
+	groupID := router.PathValue(r, "groupID")
 	if groupID == "" {
+		http.Error(w, "groupID is required", http.StatusInternalServerError)
 		return
 	}
 
 	if err := h.todoService.DeleteCompletedTodoItems(groupID); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	group, err := h.todoService.GetTodoGroupByID(groupID)
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Fprintf(w, "%+v", group)
+	component := components.TodoGroup(group)
+
+	if err := component.Render(r.Context(), w); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

@@ -6,6 +6,7 @@ import "github.com/hobord/poc-htmx-go-todolist/entities"
 type Reader interface {
 	GetTodoGroupsByUserID(userID string) ([]*entities.TodoGroup, error)
 	GetTodoGroupByID(todoGroupID string) (*entities.TodoGroup, error)
+	GetTodoItemByID(id string) (*entities.TodoItem, error)
 }
 
 //go:generate mockery --name Writer --structname MockWriter  --inpackage --case underscore --disable-version-string

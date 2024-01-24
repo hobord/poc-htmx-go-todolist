@@ -13,6 +13,7 @@ type Service interface {
 
 	AddTodoItem(todoItem *entities.TodoItem) error
 	UpdateTodoItem(todoItem *entities.TodoItem) error
+	SortTodoItems(ids []string) error
 	DeleteTodoItem(todoItemID string) error
 	DeleteCompletedTodoItems(groupID string) error
 }

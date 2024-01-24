@@ -16,7 +16,12 @@ import (
 	"github.com/hobord/poc-htmx-go-todolist/entities"
 )
 
-func CreateHandler(ctx context.Context, conf entities.ServerConfig, services *composition.ServerServices, assets fs.FS) (http.Handler, error) {
+func CreateHandler(
+	ctx context.Context,
+	conf entities.ServerConfig,
+	services *composition.ServerServices,
+	assets fs.FS,
+) (http.Handler, error) {
 	log := services.Log
 
 	log.Debug("Create http routing handlers")
@@ -67,20 +72,25 @@ func CreateHandler(ctx context.Context, conf entities.ServerConfig, services *co
 				return nil, err
 			}
 
-			todos := root.Group("/todo-group")
-			todos.GET("/", indexHandler.IndexPage)
+			todoGroup := root.Group("/group")
+			todoGroup.GET("/", indexHandler.IndexPage)
 
 			// create todo group
-			todos.POST("/create", todoHandler.CreateTodoGroup)
+			todoGroup.POST("/", todoHandler.CreateTodoGroup)
 
 			// delete todo group
-			todos.DELETE("/{groupID}", todoHandler.DeleteTodoGroup)
+			todoGroup.DELETE("/{groupID}", todoHandler.DeleteTodoGroup)
+
+			// sort group items
+			todoGroup.POST("/{groupID}/sort", todoHandler.SortItems)
+
+			todoItem := root.Group("/todo")
 
 			// add todo item
-			todos.POST("/{groupID}/add-todo", todoHandler.CreateItem)
+			todoItem.POST("/", todoHandler.CreateItem)
 
 			// delete todo item
-			todos.DELETE("/{groupID}/{itemID}", todoHandler.DeleteItem)
+			todoItem.DELETE("/{itemID}", todoHandler.DeleteItem)
 		}
 
 		// test

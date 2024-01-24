@@ -32,6 +32,23 @@ func (s *service) UpdateTodoItem(todoItem *entities.TodoItem) error {
 	return s.dal.WriteTodoItem(todoItem)
 }
 
+func (s *service) SortTodoItems(ids []string) error {
+	for i, id := range ids {
+		item, err := s.dal.GetTodoItemByID(id)
+		if err != nil {
+			return err
+		}
+
+		item.Priority = i
+
+		if err := s.dal.WriteTodoItem(item); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (s *service) DeleteTodoItem(todoItemID string) error {
 	return s.dal.DeleteTodoItem(todoItemID)
 }
