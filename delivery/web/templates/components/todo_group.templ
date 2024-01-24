@@ -24,13 +24,14 @@ templ TodoGroup(group *entities.TodoGroup) {
         Delete
     </button>
     <div class="header">{group.Title}</div>
-    <form class="sortable" 
+    <div class="sortable" 
         hx-post={ fmt.Sprintf("/group/%s/sort", group.ID) }
         hx-trigger="end"
+        hx-include=".sort"
     >
     for _, item := range sortItems(group.Todos) {
         <div hx-target="this">
-            <input type='hidden' name='item' value={item.ID}/>
+            <input type='hidden' class="sort" name='item' value={item.ID}/>
             {item.Title}
             <button 
                 hx-delete={ fmt.Sprintf("/todo/%s", item.ID) }
@@ -39,7 +40,7 @@ templ TodoGroup(group *entities.TodoGroup) {
             </button>
         </div>
     }
-    </form>
+    </div>
     <form 
         hx-post="/todo/"
     >
