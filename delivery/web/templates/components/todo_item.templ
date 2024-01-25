@@ -1,0 +1,19 @@
+package components
+
+import (
+  "fmt"
+
+  "github.com/hobord/poc-htmx-go-todolist/entities"
+)
+
+templ TodoItem(item *entities.TodoItem) {
+    <div hx-target="this">
+        <input type='hidden' class="sort" name='item' value={item.ID}/>
+        {item.Title}
+        <button 
+            hx-delete={ fmt.Sprintf("/todo/%s", item.ID) }
+        >
+            x
+        </button>
+    </div>
+}
