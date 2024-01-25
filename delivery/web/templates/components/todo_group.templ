@@ -17,30 +17,24 @@ func sortItems(items []*entities.TodoItem) []*entities.TodoItem {
 
 templ TodoGroup(group *entities.TodoGroup) {
   <div class={ "todo_group", templ.SafeClass(group.Color)} hx-target="this" >
+    <div class="header">{group.Title}</div>
     <button
         hx-delete={ fmt.Sprintf("/group/%s", group.ID) }
         hx-confirm="Are you sure?"
     >
         Delete
     </button>
-    <div class="header">{group.Title}</div>
+
     <div class="sortable" 
         hx-post={ fmt.Sprintf("/group/%s/sort", group.ID) }
         hx-trigger="end"
         hx-include=".sort"
     >
     for _, item := range sortItems(group.Todos) {
-        <div hx-target="this">
-            <input type='hidden' class="sort" name='item' value={item.ID}/>
-            {item.Title}
-            <button 
-                hx-delete={ fmt.Sprintf("/todo/%s", item.ID) }
-            >
-                x
-            </button>
-        </div>
+        @TodoItem(item)
     }
     </div>
+
     <form 
         hx-post="/todo/"
     >
@@ -54,6 +48,7 @@ templ TodoGroup(group *entities.TodoGroup) {
       </select>
       <button type="submit">add</button>
     </form>
+
   </div>
 }
 
