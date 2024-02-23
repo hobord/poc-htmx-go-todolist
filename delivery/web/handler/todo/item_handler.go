@@ -3,7 +3,6 @@ package todo
 import (
 	"net/http"
 
-	"github.com/hobord/poc-htmx-go-todolist/delivery/web/router"
 	"github.com/hobord/poc-htmx-go-todolist/delivery/web/templates/components"
 	"github.com/hobord/poc-htmx-go-todolist/entities"
 )
@@ -74,7 +73,7 @@ func (h *handler) UpdateItem(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) DeleteItem(w http.ResponseWriter, r *http.Request) {
-	itemID := router.PathValue(r, "itemID")
+	itemID := r.PathValue("itemID")
 	if itemID == "" {
 		http.Error(w, "itemID is required", http.StatusInternalServerError)
 		return
@@ -87,7 +86,7 @@ func (h *handler) DeleteItem(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) DeleteCompletedItems(w http.ResponseWriter, r *http.Request) {
-	groupID := router.PathValue(r, "groupID")
+	groupID := r.PathValue("groupID")
 	if groupID == "" {
 		http.Error(w, "groupID is required", http.StatusInternalServerError)
 		return

@@ -9,11 +9,21 @@ import (
 templ TodoItem(item *entities.TodoItem) {
     <div hx-target="this">
         <input type='hidden' class="sort" name='item' value={item.ID}/>
-        {item.Title}
+        <span>{item.Title}</span>
         <button 
             hx-delete={ fmt.Sprintf("/todo/%s", item.ID) }
         >
             x
         </button>
+    </div>
+}
+
+templ EditTodoItem(item *entities.TodoItem) {
+    <div 
+        hx-target="this"
+        hx-put={ fmt.Sprintf("/todo/%s", item.ID) }
+    >
+        <input type='hidden' class="sort" name='item' value={item.ID}/>
+        <input type="text" name="title" value={item.Title}/>
     </div>
 }
