@@ -5,14 +5,13 @@ import (
 	"io/fs"
 	"net/http"
 
-	"github.com/justinas/alice"
+	"github.com/hobord/routegroup"
 
 	"github.com/hobord/poc-htmx-go-todolist/composition"
 	"github.com/hobord/poc-htmx-go-todolist/delivery/web/handler/health"
 	"github.com/hobord/poc-htmx-go-todolist/delivery/web/handler/index"
 	"github.com/hobord/poc-htmx-go-todolist/delivery/web/handler/todo"
 	"github.com/hobord/poc-htmx-go-todolist/delivery/web/middleware"
-	"github.com/hobord/poc-htmx-go-todolist/delivery/web/router"
 	"github.com/hobord/poc-htmx-go-todolist/entities"
 )
 
@@ -26,11 +25,18 @@ func CreateHandler(
 
 	log.Debug("Create http routing handlers")
 
-	api := router.NewRouter()
+	mux := http.NewServeMux()
+
+	root := routegroup.NewGroup(
+		routegroup.WithMux(mux),
+		routegroup.WithRegisterCallback(routegroup.RegisterRouteCallback),
+		routegroup.WithRegisterPanicCallback(routegroup.RegisterPanicHandler),
+		routegroup.WithMiddlewares(routegroup.Recover),
+	)
 
 	// static assets
 	log.Debug("Register handler", "method", http.MethodGet, "path", "/assets/*path")
-	api.Handle("/assets/*", http.FileServer(http.FS(assets)))
+	root.Handle("GET /assets/*", http.FileServer(http.FS(assets)))
 
 	// health check
 	log.Debug("Register handler", "method", http.MethodGet, "path", "/health")
@@ -41,72 +47,63 @@ func CreateHandler(
 			return nil, err
 		}
 
-		api.MethodFunc(http.MethodGet, "/health", healthCheck.Health)
+		root.HandleFunc("GET /health/{$}", healthCheck.Health)
 	}
 
-	// root
-	{
-		// empty prefix for root level
-		root := router.NewGroup(api, "").
-			WithMiddlewares(
-				middleware.WithLogger(services.Log),
-			)
+	root.Use(middleware.Logger)
 
-		// index
-		indexHandler, err := index.NewHandler(services.TodoService)
+	// index
+	indexHandler, err := index.NewHandler(services.TodoService)
+	if err != nil {
+		return nil, err
+	}
+
+	root.HandleFunc("GET /{$}", indexHandler.IndexPage)
+
+	// todos
+	{
+		todoHandler, err := todo.NewHandler(services.TodoService)
 		if err != nil {
 			return nil, err
 		}
 
-		root.GET("/", indexHandler.IndexPage)
-
-		// api.Handler(http.MethodGet, "/",
-		// 	alice.New(middleware.Logger).
-		// 		Then(router.HandlerFunc(indexHandler.IndexPage)),
-		// )
-
-		// todos
+		// todo group
 		{
-			todoHandler, err := todo.NewHandler(services.TodoService)
-			if err != nil {
-				return nil, err
-			}
-
-			todoGroup := root.Group("/group")
-			todoGroup.GET("/", indexHandler.IndexPage)
+			todoGroup := root.SubGroup("/group")
+			todoGroup.HandleFunc("GET /{$}", indexHandler.IndexPage)
 
 			// create todo group
-			todoGroup.POST("/", todoHandler.CreateTodoGroup)
+			todoGroup.HandleFunc("POST /{$}", todoHandler.CreateTodoGroup)
 
 			// delete todo group
-			todoGroup.DELETE("/{groupID}", todoHandler.DeleteTodoGroup)
+			todoGroup.HandleFunc("DELETE /{groupID}", todoHandler.DeleteTodoGroup)
 
 			// sort group items
-			todoGroup.POST("/{groupID}/sort", todoHandler.SortItems)
+			todoGroup.HandleFunc("POST /{groupID}/sort", todoHandler.SortItems)
+		}
 
-			todoItem := root.Group("/todo")
+		// todo item
+		{
+			todoItem := root.SubGroup("/todo")
 
 			// add todo item
-			todoItem.POST("/", todoHandler.CreateItem)
+			todoItem.HandleFunc("POST /{$}", todoHandler.CreateItem)
 
 			// delete todo item
-			todoItem.DELETE("/{itemID}", todoHandler.DeleteItem)
+			todoItem.HandleFunc("DELETE /{itemID}", todoHandler.DeleteItem)
 		}
-
-		// test
-		{
-			testGroup := root.Group("/test")
-			testGroup.GET("/page", indexHandler.IndexPage)
-
-			{
-				sub := testGroup.Group("/sub") // .WithMiddlewares(middleware.Logger)
-				sub.GET("/page", indexHandler.IndexPage)
-			}
-		}
-
 	}
 
-	handler := alice.New(middleware.PanicRecovery).Then(api)
+	// // test
+	// {
+	// 	testGroup := root.SubGroup("/test")
+	// 	testGroup.HandleFunc("GET /page", indexHandler.IndexPage)
 
-	return handler, nil
+	// 	{
+	// 		sub := testGroup.SubGroup("/sub") // .WithMiddlewares(middleware.Logger)
+	// 		sub.HandleFunc("GET /page", indexHandler.IndexPage)
+	// 	}
+	// }
+
+	return mux, nil
 }

@@ -4,12 +4,10 @@ import (
 	"fmt"
 	"net/http"
 	"runtime"
-
-	"github.com/hobord/poc-htmx-go-todolist/delivery/web/router"
 )
 
 func PanicRecovery(next http.Handler) http.Handler {
-	return router.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
 				buf := make([]byte, 2048)

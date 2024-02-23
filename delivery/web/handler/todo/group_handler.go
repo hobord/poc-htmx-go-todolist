@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/hobord/poc-htmx-go-todolist/delivery/web/router"
 	"github.com/hobord/poc-htmx-go-todolist/delivery/web/templates/components"
 	"github.com/hobord/poc-htmx-go-todolist/entities"
 )
@@ -42,7 +41,7 @@ func (h *handler) CreateTodoGroup(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) GetTodoGroup(w http.ResponseWriter, r *http.Request) {
-	groupID := router.PathValue(r, "groupID")
+	groupID := r.PathValue("groupID")
 
 	group, err := h.todoService.GetTodoGroupByID(groupID)
 	if err != nil {
@@ -68,7 +67,7 @@ func (h *handler) GetTodoGroups(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) UpdateTodoGroup(w http.ResponseWriter, r *http.Request) {
-	groupID := router.PathValue(r, "groupID")
+	groupID := r.PathValue("groupID")
 
 	group, err := h.todoService.GetTodoGroupByID(groupID)
 	if err != nil {
@@ -99,7 +98,7 @@ func (h *handler) UpdateTodoGroup(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) DeleteTodoGroup(w http.ResponseWriter, r *http.Request) {
-	groupID := router.PathValue(r, "groupID")
+	groupID := r.PathValue("groupID")
 
 	err := h.todoService.DeleteTodoGroup(groupID)
 	if err != nil {
@@ -109,7 +108,7 @@ func (h *handler) DeleteTodoGroup(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) SortItems(w http.ResponseWriter, r *http.Request) {
-	groupID := router.PathValue(r, "groupID")
+	groupID := r.PathValue("groupID")
 	if groupID == "" {
 		http.Error(w, "groupID is required", http.StatusInternalServerError)
 		return
