@@ -36,6 +36,6 @@ coverage:
 	gocov test ./... | gocov-xml > coverage.xml
 
 build:
-	cd cmd/app/ ; \
+	cd cmd/server/ ; \
 	go build $(LDFLAGS) -o ../../bin/app .
 
